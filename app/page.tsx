@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
   return (
@@ -20,35 +18,7 @@ export default function LoginPage() {
               Dashboard admin &amp; owner Laten Coffee Shop
             </p>
 
-            <form className="mt-8 space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="nama@latencoffee.com"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Kata sandi</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <Button type="submit" className="w-full">
-                Masuk
-              </Button>
-            </form>
+            <LoginForm />
           </div>
         </div>
 
