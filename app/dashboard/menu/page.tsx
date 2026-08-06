@@ -17,12 +17,7 @@ import { AddCategoryDialog } from "@/components/menu/add-category-dialog";
 import { DeleteMenuItemButton } from "@/components/menu/delete-menu-item-button";
 import { DeleteCategoryButton } from "@/components/menu/delete-category-button";
 import { AvailabilitySwitch } from "@/components/menu/availability-switch";
-
-const currency = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  maximumFractionDigits: 0,
-});
+import { formatRupiah } from "@/lib/utils";
 
 export default async function MenuManagementPage() {
   const session = await auth();
@@ -115,7 +110,7 @@ export default async function MenuManagementPage() {
                             )}
                           </TableCell>
                           <TableCell className="tabular-nums">
-                            {currency.format(item.price)}
+                            {formatRupiah(item.price)}
                           </TableCell>
                           <TableCell>
                             <Badge
