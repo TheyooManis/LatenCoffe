@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/guards";
 import { formatClock } from "@/lib/utils";
 import { OrderCard, type OrderCardData } from "@/components/orders/order-card";
-import { OrdersAutoRefresh } from "@/components/orders/orders-auto-refresh";
+import { OrdersLiveUpdates } from "@/components/orders/orders-live-updates";
 import type { OrderStatus } from "@/lib/generated/prisma/enums";
 
 // Staff always need the current board, never a cached one.
@@ -73,7 +73,7 @@ export default async function OrdersPage() {
               : `${activeCount} pesanan aktif.`}
           </p>
         </div>
-        <OrdersAutoRefresh />
+        <OrdersLiveUpdates />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
