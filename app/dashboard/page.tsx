@@ -1,34 +1,38 @@
-import { auth, signOut } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function DashboardPage() {
   const session = await auth();
+  const isOwner = session?.user?.role === "OWNER";
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4 bg-zinc-100 p-6 dark:bg-zinc-950">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-zinc-900">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Masuk sebagai
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          Selamat datang, {session?.user?.name}
+        </h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          {session?.user?.email} &middot;{" "}
+          {session?.user?.role === "OWNER" ? "Owner" : "Admin"} &middot; Laten
+          Coffee Shop
         </p>
-        <p className="mt-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          {session?.user?.name}
-        </p>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {session?.user?.email} &middot; {session?.user?.role}
-        </p>
-
-        <form
-          className="mt-6"
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        >
-          <Button type="submit" variant="outline" className="w-full">
-            Keluar
-          </Button>
-        </form>
       </div>
+
+      {isOwner && (
+        <Link href="/dashboard/menu" className="block max-w-sm">
+          <Card className="transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+            <CardHeader>
+              <CardTitle>Kelola Menu</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Tambah, ubah, atau nonaktifkan item menu dan kategori.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
     </div>
   );
 }
