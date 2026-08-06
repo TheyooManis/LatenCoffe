@@ -1,12 +1,14 @@
+import { cache } from "react";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "./auth.config";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Callbacks (jwt/session/authorized) all come from authConfig — this instance
+// only adds the Prisma-backed provider, which can't run on the edge.
+const { handlers, auth: nextAuthAuth, signIn, signOut } = NextAuth({
   ...authConfig,
-  session: { strategy: "jwt" },
   providers: [
     Credentials({
       credentials: {
@@ -47,19 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user) {
-        token.role = user.role;
-      }
-      return token;
-    },
-    session: async ({ session, token }) => {
-      if (session.user) {
-        session.user.id = token.sub as string;
-        session.user.role = token.role as "OWNER" | "ADMIN";
-      }
-      return session;
-    },
-  },
 });
+
+export const auth = cache(nextAuthAuth);
+export { handlers, signIn, signOut };

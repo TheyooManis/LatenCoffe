@@ -7,6 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+function getSafeCallbackUrl() {
+  const raw = new URLSearchParams(window.location.search).get("callbackUrl");
+  if (!raw) return "/dashboard";
+
+  try {
+    const url = new URL(raw, window.location.origin);
+    if (url.origin !== window.location.origin) return "/dashboard";
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return "/dashboard";
+  }
+}
+
 export function LoginForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +44,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(getSafeCallbackUrl());
     router.refresh();
   }
 

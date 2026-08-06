@@ -2,9 +2,16 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import bcrypt from "bcryptjs";
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DIRECT_DATABASE_URL,
-});
+const connectionString =
+  process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error(
+    "Set DIRECT_DATABASE_URL (or DATABASE_URL) to a Postgres connection string.",
+  );
+}
+
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
