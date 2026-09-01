@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/guards";
-import { formatClock } from "@/lib/utils";
+import { formatClock, startOfTodayWita } from "@/lib/utils";
 import { OrderCard, type OrderCardData } from "@/components/orders/order-card";
 import { OrdersLiveUpdates } from "@/components/orders/orders-live-updates";
 import type { OrderStatus } from "@/lib/generated/prisma/enums";
@@ -13,17 +13,6 @@ const COLUMNS: { status: OrderStatus; title: string; hint: string }[] = [
   { status: "DIPROSES", title: "Diproses", hint: "Sedang dibuat" },
   { status: "SELESAI", title: "Selesai", hint: "Hari ini" },
 ];
-
-/** Start of today in WITA (UTC+8), so "Selesai" only shows today's orders. */
-function startOfTodayWita() {
-  const nowWita = new Date(Date.now() + 8 * 60 * 60 * 1000);
-  const midnightWita = Date.UTC(
-    nowWita.getUTCFullYear(),
-    nowWita.getUTCMonth(),
-    nowWita.getUTCDate(),
-  );
-  return new Date(midnightWita - 8 * 60 * 60 * 1000);
-}
 
 export default async function OrdersPage() {
   await requireUser();
@@ -39,7 +28,15 @@ export default async function OrdersPage() {
     include: {
       items: {
         orderBy: { nameSnapshot: "asc" },
-        select: { id: true, nameSnapshot: true, quantity: true, note: true },
+        select: {
+          id: true,
+          nameSnapshot: true,
+          quantity: true,
+          note: true,
+          options: {
+            select: { id: true, groupNameSnapshot: true, nameSnapshot: true },
+          },
+        },
       },
     },
   });

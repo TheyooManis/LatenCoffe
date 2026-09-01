@@ -1,5 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 
+/** Dashboard areas only the owner may open. Kasir/dapur get the rest. */
+const OWNER_ONLY_PREFIXES = ["/dashboard/menu", "/dashboard/meja"];
+
 export const authConfig = {
   pages: {
     signIn: "/",
@@ -26,7 +29,9 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const pathname = request.nextUrl.pathname;
       const isOnDashboard = pathname.startsWith("/dashboard");
-      const requiresOwner = pathname.startsWith("/dashboard/menu");
+      const requiresOwner = OWNER_ONLY_PREFIXES.some((prefix) =>
+        pathname.startsWith(prefix),
+      );
 
       if (isOnDashboard && !isLoggedIn) {
         return false;

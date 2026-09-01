@@ -100,6 +100,66 @@ async function seedMenu() {
   console.log(`Menu: ${menu.length} kategori`);
 }
 
+/** Size and topping choices, so the customisation flow has something to show. */
+async function seedMenuOptions() {
+  if ((await prisma.menuOptionGroup.count()) > 0) {
+    console.log("Options: already populated, skipped");
+    return;
+  }
+
+  const drinks = await prisma.menuItem.findMany({
+    where: { category: { name: { in: ["Kopi", "Non-Kopi"] } } },
+    select: { id: true },
+  });
+  if (drinks.length === 0) {
+    console.log("Options: no drinks to attach to, skipped");
+    return;
+  }
+
+  const groups = [
+    {
+      name: "Ukuran",
+      isRequired: true,
+      maxSelect: 1,
+      options: [
+        { name: "Regular", priceDelta: 0 },
+        { name: "Large", priceDelta: 6000 },
+      ],
+    },
+    {
+      name: "Topping",
+      isRequired: false,
+      maxSelect: 3,
+      options: [
+        { name: "Extra shot", priceDelta: 8000 },
+        { name: "Boba", priceDelta: 7000 },
+        { name: "Extra susu", priceDelta: 5000 },
+      ],
+    },
+  ];
+
+  for (const drink of drinks) {
+    for (const [groupIndex, group] of groups.entries()) {
+      await prisma.menuOptionGroup.create({
+        data: {
+          menuItemId: drink.id,
+          name: group.name,
+          isRequired: group.isRequired,
+          maxSelect: group.maxSelect,
+          order: groupIndex,
+          options: {
+            create: group.options.map((option, index) => ({
+              ...option,
+              order: index,
+            })),
+          },
+        },
+      });
+    }
+  }
+  console.log(`Options: ${groups.length} grup pada ${drinks.length} minuman`);
+}
+
 /** Sample orders so the kasir dashboard has something to work with. */
 async function seedOrders() {
   if ((await prisma.order.count()) > 0) {
@@ -175,6 +235,7 @@ async function main() {
   await seedUsers();
   await seedTables();
   await seedMenu();
+  await seedMenuOptions();
   await seedOrders();
 }
 

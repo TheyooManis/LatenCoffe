@@ -37,19 +37,58 @@ model Category {
 }
 
 model MenuItem {
-  id          String      @id @default(cuid())
-  name        String
-  description String?
-  price       Int
-  imageUrl    String?
-  isAvailable Boolean     @default(true)
-  categoryId  String
-  category    Category    @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String            @id @default(cuid())
+  name         String
+  description  String?
+  price        Int
+  imageUrl     String?
+  isAvailable  Boolean           @default(true)
+  categoryId   String
+  category     Category          @relation(fields: [categoryId], references: [id])
+  orderItems   OrderItem[]
+  optionGroups MenuOptionGroup[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   @@index([categoryId])
+}
+
+/// A question the customer answers before ordering an item, e.g. "Ukuran" or
+/// "Topping". Belongs to one menu item so the owner can price a large latte
+/// differently from a large tea.
+model MenuOptionGroup {
+  id         String   @id @default(cuid())
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  name       String
+  /// The item cannot be added to the cart until at least one choice is made.
+  isRequired Boolean  @default(false)
+  /// 1 = pick one, more = pick up to this many.
+  maxSelect  Int      @default(1)
+  order      Int      @default(0)
+
+  options   MenuOption[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([menuItemId])
+}
+
+model MenuOption {
+  id      String          @id @default(cuid())
+  groupId String
+  group   MenuOptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name    String
+  /// Added to the item's base price. 0 for choices that cost nothing.
+  priceDelta  Int     @default(0)
+  isAvailable Boolean @default(true)
+  order       Int     @default(0)
+
+  orderItemOptions OrderItemOption[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([groupId])
 }
 
 enum OrderStatus {
@@ -119,6 +158,26 @@ model OrderItem {
   quantity Int
   note     String?
 
+  options OrderItemOption[]
+
   @@index([orderId])
   @@index([menuItemId])
+}
+
+/// One choice the customer made for an order line, e.g. Ukuran = Large.
+model OrderItemOption {
+  id          String    @id @default(cuid())
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  menuOptionId String
+  menuOption   MenuOption @relation(fields: [menuOptionId], references: [id])
+  /// Snapshotted for the same reason as OrderItem: the barista's ticket and old
+  /// sales reports must survive the owner renaming or repricing a choice.
+  groupNameSnapshot  String
+  nameSnapshot       String
+  priceDeltaSnapshot Int
+
+  @@index([orderItemId])
+  @@index([menuOptionId])
 }

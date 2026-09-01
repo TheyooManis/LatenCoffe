@@ -34,18 +34,35 @@ export default async function DashboardPage() {
         </Link>
 
         {isOwner && (
-          <Link href="/dashboard/menu" className="block">
-            <Card className="h-full transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
-              <CardHeader>
-                <CardTitle>Kelola Menu</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Tambah, ubah, atau nonaktifkan item menu dan kategori.
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+          <>
+            <Link href="/dashboard/menu" className="block">
+              <Card className="h-full transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+                <CardHeader>
+                  <CardTitle>Kelola Menu</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Tambah, ubah, atau nonaktifkan item menu, kategori, dan
+                    pilihan ukuran/topping.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/dashboard/meja" className="block">
+              <Card className="h-full transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+                <CardHeader>
+                  <CardTitle>Meja &amp; QR</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Cetak QR untuk ditempel di tiap meja, tambah meja, atau
+                    ganti QR yang bocor.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </>
         )}
       </div>
     </div>

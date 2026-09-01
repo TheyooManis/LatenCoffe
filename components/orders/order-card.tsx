@@ -24,6 +24,7 @@ export type OrderCardData = {
     nameSnapshot: string;
     quantity: number;
     note: string | null;
+    options: { id: string; groupNameSnapshot: string; nameSnapshot: string }[];
   }[];
 };
 
@@ -63,6 +64,11 @@ export function OrderCard({ order }: { order: OrderCardData }) {
             <span className="text-zinc-700 dark:text-zinc-300">
               {item.nameSnapshot}
             </span>
+            {item.options.length > 0 && (
+              <p className="ml-5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                {item.options.map((option) => option.nameSnapshot).join(" · ")}
+              </p>
+            )}
             {item.note && (
               <p className="ml-5 text-xs text-amber-700 dark:text-amber-500">
                 {item.note}

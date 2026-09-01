@@ -3,24 +3,24 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-type RunOptions = {
+type RunOptions<T> = {
   successMessage?: string;
   errorMessage: string;
   /** Prefer `error.message` over `errorMessage` when the thrown value is an Error instance. */
   useErrorMessage?: boolean;
-  onSuccess?: () => void;
+  onSuccess?: (result: T) => void;
   onError?: () => void;
 };
 
 export function useServerActionToast() {
   const [isPending, startTransition] = useTransition();
 
-  function run(action: () => Promise<void>, options: RunOptions) {
+  function run<T>(action: () => Promise<T>, options: RunOptions<T>) {
     startTransition(async () => {
       try {
-        await action();
+        const result = await action();
         if (options.successMessage) toast.success(options.successMessage);
-        options.onSuccess?.();
+        options.onSuccess?.(result);
       } catch (error) {
         options.onError?.();
         const message =

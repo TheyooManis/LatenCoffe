@@ -1,5 +1,10 @@
 import { redirect } from "next/navigation";
-import { PencilIcon, PlusIcon } from "lucide-react";
+import {
+  ImageIcon,
+  PencilIcon,
+  PlusIcon,
+  SlidersHorizontalIcon,
+} from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +22,7 @@ import { AddCategoryDialog } from "@/components/menu/add-category-dialog";
 import { DeleteMenuItemButton } from "@/components/menu/delete-menu-item-button";
 import { DeleteCategoryButton } from "@/components/menu/delete-category-button";
 import { AvailabilitySwitch } from "@/components/menu/availability-switch";
+import { OptionGroupsDialog } from "@/components/menu/option-groups-dialog";
 import { formatRupiah } from "@/lib/utils";
 
 export default async function MenuManagementPage() {
@@ -27,7 +33,19 @@ export default async function MenuManagementPage() {
 
   const categories = await prisma.category.findMany({
     orderBy: { order: "asc" },
-    include: { menuItems: { orderBy: { name: "asc" } } },
+    include: {
+      menuItems: {
+        orderBy: { name: "asc" },
+        include: {
+          optionGroups: {
+            orderBy: [{ order: "asc" }, { name: "asc" }],
+            include: {
+              options: { orderBy: [{ order: "asc" }, { name: "asc" }] },
+            },
+          },
+        },
+      },
+    },
   });
 
   const categoryOptions = categories.map((category) => ({
@@ -102,12 +120,31 @@ export default async function MenuManagementPage() {
                       {category.menuItems.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
-                            {item.name}
-                            {item.description && (
-                              <p className="mt-0.5 text-xs font-normal text-zinc-500">
-                                {item.description}
-                              </p>
-                            )}
+                            <div className="flex items-center gap-3">
+                              {item.imageUrl ? (
+                                // Plain <img>: the URL points at our storage
+                                // bucket, and next/image would need that host
+                                // whitelisted in next.config.
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={item.imageUrl}
+                                  alt=""
+                                  className="size-10 shrink-0 rounded-md object-cover"
+                                />
+                              ) : (
+                                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
+                                  <ImageIcon className="size-4 text-zinc-400" />
+                                </div>
+                              )}
+                              <div>
+                                {item.name}
+                                {item.description && (
+                                  <p className="mt-0.5 text-xs font-normal text-zinc-500">
+                                    {item.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell className="tabular-nums">
                             {formatRupiah(item.price)}
@@ -127,6 +164,19 @@ export default async function MenuManagementPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-1">
+                              <OptionGroupsDialog
+                                itemId={item.id}
+                                itemName={item.name}
+                                groups={item.optionGroups}
+                                triggerRender={
+                                  <Button variant="ghost" size="sm" />
+                                }
+                              >
+                                <SlidersHorizontalIcon />
+                                {item.optionGroups.length > 0
+                                  ? `${item.optionGroups.length} pilihan`
+                                  : "Pilihan"}
+                              </OptionGroupsDialog>
                               <MenuItemDialog
                                 categories={categoryOptions}
                                 item={item}

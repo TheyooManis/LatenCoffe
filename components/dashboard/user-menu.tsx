@@ -3,6 +3,7 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -25,10 +26,14 @@ export function UserMenu({
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>
-          <p className="font-medium">{name}</p>
-          <p className="text-xs font-normal text-zinc-500">{email}</p>
-        </DropdownMenuLabel>
+        {/* Base UI's GroupLabel reads its group from context, so it must sit
+            inside a Group — outside one it throws when the menu opens. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <p className="font-medium">{name}</p>
+            <p className="text-xs font-normal text-zinc-500">{email}</p>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {/* Plain form (not a DropdownMenuItem) so sign-out still works as a
             real POST if client-side event handling ever fails. */}

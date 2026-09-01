@@ -27,3 +27,19 @@ const clock = new Intl.DateTimeFormat("id-ID", {
 export function formatClock(date: Date) {
   return clock.format(date)
 }
+
+const WITA_OFFSET_MS = 8 * 60 * 60 * 1000
+
+/**
+ * Start of today in WITA (UTC+8). The cafe's day — not the server's — is what
+ * decides which orders are "today" and where the queue numbering restarts.
+ */
+export function startOfTodayWita() {
+  const nowWita = new Date(Date.now() + WITA_OFFSET_MS)
+  const midnightWita = Date.UTC(
+    nowWita.getUTCFullYear(),
+    nowWita.getUTCMonth(),
+    nowWita.getUTCDate()
+  )
+  return new Date(midnightWita - WITA_OFFSET_MS)
+}

@@ -22,8 +22,9 @@ export default async function DashboardLayout({
 
   return (
     <SessionProvider>
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    {/* print: the QR sheet is the only thing meant to reach paper. */}
+    <div className="min-h-screen bg-zinc-50 print:bg-white dark:bg-zinc-950">
+      <header className="border-b border-zinc-200 bg-white print:hidden dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="flex items-center gap-2">
@@ -49,12 +50,20 @@ export default async function DashboardLayout({
                 Pesanan
               </Link>
               {isOwner && (
-                <Link
-                  href="/dashboard/menu"
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-                >
-                  Kelola Menu
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard/menu"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+                  >
+                    Kelola Menu
+                  </Link>
+                  <Link
+                    href="/dashboard/meja"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+                  >
+                    Meja &amp; QR
+                  </Link>
+                </>
               )}
             </nav>
           </div>
@@ -67,7 +76,7 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 print:max-w-none print:p-0">
         {children}
       </main>
     </div>
