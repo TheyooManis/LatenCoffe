@@ -68,20 +68,8 @@ async function seedMenu() {
         { name: "Cappuccino", price: 25000, description: "Espresso dengan susu berbusa" },
       ],
     },
-    {
-      category: "Non-Kopi",
-      items: [
-        { name: "Matcha Latte", price: 26000, description: "Matcha premium dan susu" },
-        { name: "Cokelat Panas", price: 23000, description: "Cokelat asli, disajikan hangat" },
-      ],
-    },
-    {
-      category: "Makanan Ringan",
-      items: [
-        { name: "Pisang Goreng", price: 15000, description: "Disajikan dengan cokelat atau keju" },
-        { name: "Kentang Goreng", price: 20000, description: null },
-      ],
-    },
+    
+    
   ];
 
   for (const [index, group] of menu.entries()) {
