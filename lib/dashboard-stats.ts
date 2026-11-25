@@ -67,7 +67,7 @@ export async function getDashboardStats(): Promise<DashboardStatsData> {
       prisma.order.findMany({
         where: {
           status: "SELESAI",
-          createdAt: { gte: startToday },
+          updatedAt: { gte: startToday },
         },
         include: {
           items: true,
@@ -76,17 +76,17 @@ export async function getDashboardStats(): Promise<DashboardStatsData> {
       prisma.order.findMany({
         where: {
           status: "SELESAI",
-          createdAt: { gte: startSevenDays },
+          updatedAt: { gte: startSevenDays },
         },
         select: {
-          createdAt: true,
+          updatedAt: true,
           totalAmount: true,
         },
       }),
       prisma.order.findMany({
         where: {
           status: "SELESAI",
-          createdAt: { gte: startThirtyDays },
+          updatedAt: { gte: startThirtyDays },
         },
         include: {
           items: true,
@@ -132,7 +132,7 @@ export async function getDashboardStats(): Promise<DashboardStatsData> {
   }
 
   todayOrders.forEach((o) => {
-    const orderWita = new Date(o.createdAt.getTime() + WITA_OFFSET);
+    const orderWita = new Date(o.updatedAt.getTime() + WITA_OFFSET);
     const hour = orderWita.getUTCHours();
     const existing = hourlyMap.get(hour) ?? { omzet: 0, pesanan: 0 };
     hourlyMap.set(hour, {
@@ -168,7 +168,7 @@ export async function getDashboardStats(): Promise<DashboardStatsData> {
   }
 
   sevenDaysOrders.forEach((o) => {
-    const orderWita = new Date(o.createdAt.getTime() + WITA_OFFSET);
+    const orderWita = new Date(o.updatedAt.getTime() + WITA_OFFSET);
     const key = `${orderWita.getUTCFullYear()}-${String(orderWita.getUTCMonth() + 1).padStart(2, "0")}-${String(orderWita.getUTCDate()).padStart(2, "0")}`;
     const existing = sevenDaysMap.get(key);
     if (existing) {

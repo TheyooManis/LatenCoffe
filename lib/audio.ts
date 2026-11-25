@@ -1,19 +1,46 @@
 /**
  * Web Audio API synthesized notification sound for order alerts.
- * Uses zero external network assets and plays instantly.
+ * Uses a shared AudioContext and unlocks automatically on first user gesture
+ * so real-time SSE notifications play reliably without manual toggle.
  */
+let sharedAudioCtx: AudioContext | null = null;
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  if (sharedAudioCtx) return sharedAudioCtx;
+
+  const AudioCtx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext: typeof AudioContext })
+      .webkitAudioContext;
+
+  if (!AudioCtx) return null;
+  sharedAudioCtx = new AudioCtx();
+  return sharedAudioCtx;
+}
+
+export function unlockAudioContext() {
+  try {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === "suspended") {
+      void ctx.resume();
+    }
+  } catch {
+    // Ignore if browser blocks audio context initialization
+  }
+}
+
 export function playOrderNotificationSound() {
   if (typeof window === "undefined") return;
 
   try {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext;
+    const ctx = getAudioContext();
+    if (!ctx) return;
 
-    if (!AudioCtx) return;
+    if (ctx.state === "suspended") {
+      void ctx.resume();
+    }
 
-    const ctx = new AudioCtx();
     const now = ctx.currentTime;
 
     // Tone 1: G5 (784 Hz) - Warm soft bell

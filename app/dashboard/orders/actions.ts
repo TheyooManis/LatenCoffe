@@ -34,6 +34,7 @@ export async function advanceOrderStatus(
   }
 
   revalidatePath("/dashboard/orders");
+  revalidatePath("/dashboard");
 }
 
 export async function markOrderPaid(orderId: string) {
@@ -45,4 +46,5 @@ export async function markOrderPaid(orderId: string) {
   });
 
   revalidatePath("/dashboard/orders");
+  revalidatePath("/dashboard");
 }

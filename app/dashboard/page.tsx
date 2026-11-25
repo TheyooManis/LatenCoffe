@@ -5,6 +5,8 @@ import { ExportSalesDialog } from "@/components/dashboard/export-sales-dialog";
 import { SalesAnalyticsClient } from "@/components/dashboard/sales-analytics-client";
 import { getDashboardStats } from "@/lib/dashboard-stats";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const session = await auth();
   const isOwner = session?.user?.role === "OWNER";

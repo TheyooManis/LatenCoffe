@@ -15,7 +15,7 @@ export default async function OrdersPage() {
     where: {
       OR: [
         { status: { in: ["DITERIMA", "DIPROSES"] } },
-        { status: "SELESAI", createdAt: { gte: startOfTodayWita() } },
+        { status: "SELESAI", updatedAt: { gte: startOfTodayWita() } },
       ],
     },
     orderBy: { createdAt: "asc" },
