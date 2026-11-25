@@ -92,16 +92,16 @@ export async function GET(request: Request) {
 
   const { startDate, endDate } = getWitaRange(range, customStart, customEnd);
 
-  // Fetch all completed orders in the range
+  // Fetch all completed orders in the range (based on completion time / updatedAt)
   const orders = await prisma.order.findMany({
     where: {
       status: "SELESAI",
-      createdAt: {
+      updatedAt: {
         gte: startDate,
         lte: endDate,
       },
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: { updatedAt: "asc" },
     include: {
       items: {
         orderBy: { nameSnapshot: "asc" },
@@ -224,8 +224,8 @@ export async function GET(request: Request) {
 
   let rowIndex = 2;
   orders.forEach((order) => {
-    const timeLabel = formatWitaDateTime(order.createdAt).split(" ")[1]; // extract time
-    const dateLabel = formatWitaDateTime(order.createdAt).split(" ")[0]; // extract date
+    const timeLabel = formatWitaDateTime(order.updatedAt).split(" ")[1]; // extract time
+    const dateLabel = formatWitaDateTime(order.updatedAt).split(" ")[0]; // extract date
     const fullTime = `${dateLabel} ${timeLabel}`;
 
     order.items.forEach((item) => {

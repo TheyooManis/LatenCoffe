@@ -45,7 +45,9 @@ export function ExportSalesDialog() {
         params.set("to", endDate);
       }
 
-      const response = await fetch(`/api/dashboard/export-sales?${params.toString()}`);
+      const response = await fetch(`/api/dashboard/export-sales?${params.toString()}`, {
+        cache: "no-store",
+      });
       if (!response.ok) {
         throw new Error("Gagal mengunduh laporan penjualan.");
       }
