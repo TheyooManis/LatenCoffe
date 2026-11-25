@@ -46,12 +46,14 @@ export function OptionGroupsDialog({
   itemId,
   itemName,
   groups,
+  isOwner = true,
   triggerRender,
   children,
 }: {
   itemId: string;
   itemName: string;
   groups: OptionGroupView[];
+  isOwner?: boolean;
   triggerRender: React.ReactElement;
   children: React.ReactNode;
 }) {
@@ -80,55 +82,60 @@ export function OptionGroupsDialog({
               <GroupCard
                 key={group.id}
                 group={group}
+                isOwner={isOwner}
                 isPending={isPending}
                 run={run}
               />
             ))
           )}
 
-          <Separator />
+          {isOwner && (
+            <>
+              <Separator />
 
-          <form
-            action={(formData) =>
-              run(() => createOptionGroup(itemId, formData), {
-                successMessage: "Grup pilihan ditambahkan.",
-                errorMessage: "Gagal menambah grup pilihan.",
-                useErrorMessage: true,
-              })
-            }
-            className="space-y-3 rounded-lg border border-border p-3"
-          >
-            <p className="text-sm font-medium">Tambah grup pilihan</p>
+              <form
+                action={(formData) =>
+                  run(() => createOptionGroup(itemId, formData), {
+                    successMessage: "Grup pilihan ditambahkan.",
+                    errorMessage: "Gagal menambah grup pilihan.",
+                    useErrorMessage: true,
+                  })
+                }
+                className="space-y-3 rounded-lg border border-border p-3"
+              >
+                <p className="text-sm font-medium">Tambah grup pilihan</p>
 
-            <div className="grid grid-cols-[1fr_auto] gap-2">
-              <Input name="name" placeholder="Ukuran" required />
-              <Input
-                name="maxSelect"
-                type="number"
-                min={1}
-                max={20}
-                defaultValue={1}
-                className="w-20"
-                aria-label="Maksimal pilihan"
-              />
-            </div>
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <Input name="name" placeholder="Ukuran" required />
+                  <Input
+                    name="maxSelect"
+                    type="number"
+                    min={1}
+                    max={20}
+                    defaultValue={1}
+                    className="w-20"
+                    aria-label="Maksimal pilihan"
+                  />
+                </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <Label className="font-normal">Wajib dipilih</Label>
-              <Switch name="isRequired" />
-            </div>
+                <div className="flex items-center justify-between gap-3">
+                  <Label className="font-normal">Wajib dipilih</Label>
+                  <Switch name="isRequired" />
+                </div>
 
-            <p className="text-xs text-muted-foreground">
-              Angka di sebelah nama adalah maksimal pilihan. Isi 1 untuk
-              &quot;pilih satu&quot; seperti Ukuran, lebih dari 1 untuk
-              &quot;boleh pilih beberapa&quot; seperti Topping.
-            </p>
+                <p className="text-xs text-muted-foreground">
+                  Angka di sebelah nama adalah maksimal pilihan. Isi 1 untuk
+                  &quot;pilih satu&quot; seperti Ukuran, lebih dari 1 untuk
+                  &quot;boleh pilih beberapa&quot; seperti Topping.
+                </p>
 
-            <Button type="submit" size="sm" disabled={isPending}>
-              <PlusIcon />
-              Tambah grup
-            </Button>
-          </form>
+                <Button type="submit" size="sm" disabled={isPending}>
+                  <PlusIcon />
+                  Tambah grup
+                </Button>
+              </form>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -139,47 +146,58 @@ type Run = ReturnType<typeof useServerActionToast>["run"];
 
 function GroupCard({
   group,
+  isOwner,
   isPending,
   run,
 }: {
   group: OptionGroupView;
+  isOwner: boolean;
   isPending: boolean;
   run: Run;
 }) {
   return (
     <section className="space-y-3 rounded-lg border border-border p-3">
-      <form
-        action={(formData) =>
-          run(() => updateOptionGroup(group.id, formData), {
-            successMessage: "Grup pilihan diperbarui.",
-            errorMessage: "Gagal memperbarui grup.",
-            useErrorMessage: true,
-          })
-        }
-        className="space-y-3"
-      >
-        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
-          <Input name="name" defaultValue={group.name} required />
-          <Input
-            name="maxSelect"
-            type="number"
-            min={1}
-            max={20}
-            defaultValue={group.maxSelect}
-            className="w-20"
-            aria-label={`Maksimal pilihan untuk ${group.name}`}
-          />
-          <Button type="submit" variant="outline" size="icon" disabled={isPending}>
-            <CheckIcon />
-            <span className="sr-only">Simpan {group.name}</span>
-          </Button>
+      {!isOwner ? (
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{group.name}</span>
+          <span className="text-xs text-zinc-500">
+            {group.isRequired ? "Wajib" : "Opsional"} &middot; Maks {group.maxSelect}
+          </span>
         </div>
+      ) : (
+        <form
+          action={(formData) =>
+            run(() => updateOptionGroup(group.id, formData), {
+              successMessage: "Grup pilihan diperbarui.",
+              errorMessage: "Gagal memperbarui grup.",
+              useErrorMessage: true,
+            })
+          }
+          className="space-y-3"
+        >
+          <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
+            <Input name="name" defaultValue={group.name} required />
+            <Input
+              name="maxSelect"
+              type="number"
+              min={1}
+              max={20}
+              defaultValue={group.maxSelect}
+              className="w-20"
+              aria-label={`Maksimal pilihan untuk ${group.name}`}
+            />
+            <Button type="submit" variant="outline" size="icon" disabled={isPending}>
+              <CheckIcon />
+              <span className="sr-only">Simpan {group.name}</span>
+            </Button>
+          </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <Label className="font-normal">Wajib dipilih</Label>
-          <Switch name="isRequired" defaultChecked={group.isRequired} />
-        </div>
-      </form>
+          <div className="flex items-center justify-between gap-3">
+            <Label className="font-normal">Wajib dipilih</Label>
+            <Switch name="isRequired" defaultChecked={group.isRequired} />
+          </div>
+        </form>
+      )}
 
       <div className="space-y-1.5">
         {group.options.length === 0 && (
@@ -192,35 +210,44 @@ function GroupCard({
 
         {group.options.map((option) => (
           <div key={option.id} className="flex items-center gap-2">
-            <form
-              action={(formData) =>
-                run(() => updateOption(option.id, formData), {
-                  successMessage: "Opsi diperbarui.",
-                  errorMessage: "Gagal memperbarui opsi.",
-                  useErrorMessage: true,
-                })
-              }
-              className="grid flex-1 grid-cols-[1fr_auto_auto] items-center gap-2"
-            >
-              <Input name="name" defaultValue={option.name} required />
-              <Input
-                name="priceDelta"
-                type="number"
-                step={500}
-                defaultValue={option.priceDelta}
-                className="w-24"
-                aria-label={`Tambahan harga ${option.name}`}
-              />
-              <Button
-                type="submit"
-                variant="outline"
-                size="icon"
-                disabled={isPending}
+            {isOwner ? (
+              <form
+                action={(formData) =>
+                  run(() => updateOption(option.id, formData), {
+                    successMessage: "Opsi diperbarui.",
+                    errorMessage: "Gagal memperbarui opsi.",
+                    useErrorMessage: true,
+                  })
+                }
+                className="grid flex-1 grid-cols-[1fr_auto_auto] items-center gap-2"
               >
-                <CheckIcon />
-                <span className="sr-only">Simpan {option.name}</span>
-              </Button>
-            </form>
+                <Input name="name" defaultValue={option.name} required />
+                <Input
+                  name="priceDelta"
+                  type="number"
+                  step={500}
+                  defaultValue={option.priceDelta}
+                  className="w-24"
+                  aria-label={`Tambahan harga ${option.name}`}
+                />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="icon"
+                  disabled={isPending}
+                >
+                  <CheckIcon />
+                  <span className="sr-only">Simpan {option.name}</span>
+                </Button>
+              </form>
+            ) : (
+              <div className="flex flex-1 items-center justify-between pr-2">
+                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{option.name}</span>
+                <span className="text-xs tabular-nums text-zinc-500">
+                  {option.priceDelta > 0 ? `+${formatRupiah(option.priceDelta)}` : "Gratis"}
+                </span>
+              </div>
+            )}
 
             <Switch
               checked={option.isAvailable}
@@ -233,23 +260,25 @@ function GroupCard({
               }
             />
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={isPending}
-              onClick={() => {
-                if (!window.confirm(`Hapus opsi "${option.name}"?`)) return;
-                run(() => deleteOption(option.id), {
-                  successMessage: "Opsi dihapus.",
-                  errorMessage: "Gagal menghapus opsi.",
-                  useErrorMessage: true,
-                });
-              }}
-            >
-              <Trash2Icon className="text-muted-foreground" />
-              <span className="sr-only">Hapus {option.name}</span>
-            </Button>
+            {isOwner && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                disabled={isPending}
+                onClick={() => {
+                  if (!window.confirm(`Hapus opsi "${option.name}"?`)) return;
+                  run(() => deleteOption(option.id), {
+                    successMessage: "Opsi dihapus.",
+                    errorMessage: "Gagal menghapus opsi.",
+                    useErrorMessage: true,
+                  });
+                }}
+              >
+                <Trash2Icon className="text-muted-foreground" />
+                <span className="sr-only">Hapus {option.name}</span>
+              </Button>
+            )}
           </div>
         ))}
 
@@ -259,53 +288,57 @@ function GroupCard({
         </p>
       </div>
 
-      <form
-        action={(formData) =>
-          run(() => createOption(group.id, formData), {
-            successMessage: "Opsi ditambahkan.",
-            errorMessage: "Gagal menambah opsi.",
-            useErrorMessage: true,
-          })
-        }
-        className="grid grid-cols-[1fr_auto_auto] items-center gap-2"
-      >
-        <Input name="name" placeholder="Large" required />
-        <Input
-          name="priceDelta"
-          type="number"
-          step={500}
-          defaultValue={0}
-          className="w-24"
-          aria-label="Tambahan harga opsi baru"
-        />
-        <Button type="submit" variant="outline" size="icon" disabled={isPending}>
-          <PlusIcon />
-          <span className="sr-only">Tambah opsi</span>
-        </Button>
-      </form>
+      {isOwner && (
+        <>
+          <form
+            action={(formData) =>
+              run(() => createOption(group.id, formData), {
+                successMessage: "Opsi ditambahkan.",
+                errorMessage: "Gagal menambah opsi.",
+                useErrorMessage: true,
+              })
+            }
+            className="grid grid-cols-[1fr_auto_auto] items-center gap-2"
+          >
+            <Input name="name" placeholder="Large" required />
+            <Input
+              name="priceDelta"
+              type="number"
+              step={500}
+              defaultValue={0}
+              className="w-24"
+              aria-label="Tambahan harga opsi baru"
+            />
+            <Button type="submit" variant="outline" size="icon" disabled={isPending}>
+              <PlusIcon />
+              <span className="sr-only">Tambah opsi</span>
+            </Button>
+          </form>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="text-destructive"
-        disabled={isPending}
-        onClick={() => {
-          if (
-            !window.confirm(
-              `Hapus grup "${group.name}" beserta semua opsinya? Pesanan lama tidak terpengaruh.`,
-            )
-          )
-            return;
-          run(() => deleteOptionGroup(group.id), {
-            successMessage: "Grup pilihan dihapus.",
-            errorMessage: "Gagal menghapus grup.",
-            useErrorMessage: true,
-          });
-        }}
-      >
-        Hapus grup ini
-      </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive"
+            disabled={isPending}
+            onClick={() => {
+              if (
+                !window.confirm(
+                  `Hapus grup "${group.name}" beserta semua opsinya? Pesanan lama tidak terpengaruh.`,
+                )
+              )
+                return;
+              run(() => deleteOptionGroup(group.id), {
+                successMessage: "Grup pilihan dihapus.",
+                errorMessage: "Gagal menghapus grup.",
+                useErrorMessage: true,
+              });
+            }}
+          >
+            Hapus grup ini
+          </Button>
+        </>
+      )}
     </section>
   );
 }

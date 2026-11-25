@@ -170,7 +170,7 @@ export function MenuBrowser({
                     block: "start",
                   })
                 }
-                className="shrink-0 rounded-full border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700 active:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:active:bg-zinc-900"
+                className="shrink-0 rounded-full border border-zinc-200/90 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-all hover:bg-zinc-50 hover:text-zinc-900 active:scale-95 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
               >
                 {category.name}
               </button>
@@ -179,98 +179,202 @@ export function MenuBrowser({
         )}
       </header>
 
-      <main className="flex-1 px-4 pb-6">
-        {categories.length === 0 ? (
-          <p className="py-20 text-center text-sm text-zinc-500">
-            Menu belum tersedia. Silakan tanyakan ke kasir.
-          </p>
-        ) : (
-          categories.map((category) => (
-            <section
-              key={category.id}
-              ref={(node) => {
-                if (node) sections.current.set(category.id, node);
-                else sections.current.delete(category.id);
-              }}
-              // Clears the sticky header when a category chip scrolls here.
-              className="scroll-mt-32 pt-6"
-            >
-              <h2 className="text-sm font-semibold tracking-wide text-zinc-500 uppercase">
-                {category.name}
-              </h2>
+      {/* Main Content: Split-layout on Desktop/Tablet Landscape (lg:) */}
+      <div className="flex-1 lg:grid lg:grid-cols-[1fr_360px] lg:items-start lg:gap-8 lg:p-6">
+        <main className="flex-1 px-4 pb-6 lg:px-0 lg:pb-0">
+          {categories.length === 0 ? (
+            <p className="py-20 text-center text-sm text-zinc-500">
+              Menu belum tersedia. Silakan tanyakan ke kasir.
+            </p>
+          ) : (
+            categories.map((category) => (
+              <section
+                key={category.id}
+                ref={(node) => {
+                  if (node) sections.current.set(category.id, node);
+                  else sections.current.delete(category.id);
+                }}
+                className="scroll-mt-32 pt-6 first:pt-4"
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-xs font-bold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                    {category.name}
+                  </h2>
+                  <span className="text-[11px] font-medium text-zinc-400">
+                    {category.items.length} menu
+                  </span>
+                </div>
 
-              <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {category.items.map((item) => {
-                  const quantity = quantityByItem.get(item.id) ?? 0;
-                  const hasOptions = item.optionGroups.length > 0;
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {category.items.map((item) => {
+                    const quantity = quantityByItem.get(item.id) ?? 0;
+                    const hasOptions = item.optionGroups.length > 0;
 
-                  return (
-                    <li key={item.id}>
+                    return (
                       <button
+                        key={item.id}
                         type="button"
                         onClick={() => setEditing({ item, line: null })}
-                        className="flex w-full items-start gap-3 py-3 text-left"
+                        className="group relative flex items-start justify-between gap-3 rounded-2xl border border-zinc-200/80 bg-white p-3.5 text-left transition-all duration-150 hover:border-zinc-300 hover:shadow-xs active:scale-[0.99] dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:border-zinc-700"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                          <p className="font-semibold text-zinc-900 transition-colors group-hover:text-zinc-950 dark:text-zinc-100">
                             {item.name}
                           </p>
                           {item.description && (
-                            <p className="mt-0.5 line-clamp-2 text-sm text-zinc-500">
+                            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-500">
                               {item.description}
                             </p>
                           )}
-                          <p className="mt-1 text-sm font-semibold text-zinc-900 tabular-nums dark:text-zinc-100">
-                            {formatRupiah(item.price)}
+                          <div className="mt-2.5 flex items-center gap-2">
+                            <span className="text-sm font-bold text-zinc-900 tabular-nums dark:text-zinc-100">
+                              {formatRupiah(item.price)}
+                            </span>
                             {hasOptions && (
-                              <span className="ml-1.5 text-xs font-normal text-zinc-500">
-                                bisa dikustom
+                              <span className="rounded-md bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                                Kustom
                               </span>
                             )}
-                          </p>
+                          </div>
                         </div>
 
                         <div className="relative shrink-0">
                           {item.imageUrl ? (
-                            // Plain <img>: the URL is owner-supplied, so
-                            // next/image would need every possible host allowed
-                            // in next.config.
-                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={item.imageUrl}
                               alt=""
                               loading="lazy"
-                              className="size-20 rounded-lg object-cover"
+                              className="size-20 rounded-xl object-cover shadow-2xs transition-transform duration-200 group-hover:scale-105"
                             />
                           ) : (
-                            <div className="flex size-20 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-900">
+                            <div className="flex size-20 items-center justify-center rounded-xl bg-zinc-100/90 transition-colors group-hover:bg-zinc-200/70 dark:bg-zinc-800/80 dark:group-hover:bg-zinc-800">
                               <CoffeeIcon className="size-6 text-zinc-400" />
                             </div>
                           )}
 
-                          <span className="absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white ring-2 ring-white dark:bg-zinc-50 dark:text-zinc-900 dark:ring-zinc-950">
-                            {quantity > 0 ? quantity : <PlusIcon className="size-4" />}
+                          <span className="absolute -right-1.5 -bottom-1.5 flex size-7 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white shadow-xs ring-2 ring-white transition-transform group-hover:scale-110 dark:bg-white dark:text-zinc-950 dark:ring-zinc-900">
+                            {quantity > 0 ? quantity : <PlusIcon className="size-3.5" />}
                           </span>
                         </div>
                       </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))
-        )}
-      </main>
+                    );
+                  })}
+                </div>
+              </section>
+            ))
+          )}
+        </main>
 
+        {/* Desktop Sticky Order Summary Sidebar */}
+        <aside className="hidden lg:sticky lg:top-24 lg:block lg:rounded-2xl lg:border lg:border-zinc-200/90 lg:bg-white lg:p-5 lg:shadow-xs dark:lg:border-zinc-800 dark:lg:bg-zinc-900/80">
+          <div className="border-b border-zinc-100 pb-3 dark:border-zinc-800">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+              Keranjang Pesanan
+            </h3>
+            <p className="text-xs text-zinc-500">Meja {tableId} &middot; {totalQuantity} item dipilih</p>
+          </div>
+
+          {entries.length === 0 ? (
+            <div className="py-10 text-center">
+              <CoffeeIcon className="mx-auto size-8 text-zinc-300 dark:text-zinc-700" />
+              <p className="mt-2 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                Keranjang masih kosong
+              </p>
+              <p className="mt-0.5 text-xs text-zinc-400">
+                Pilih menu di samping untuk menambahkan ke pesanan
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-4">
+              <ul className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                {entries.map((entry) => (
+                  <li
+                    key={entry.key}
+                    className="flex items-start justify-between gap-2 border-b border-zinc-100 pb-2.5 dark:border-zinc-800/60"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                        {entry.item.name}
+                      </p>
+                      {entry.options.length > 0 && (
+                        <p className="text-[11px] text-zinc-500">
+                          {entry.options.map((o) => o.name).join(", ")}
+                        </p>
+                      )}
+                      <p className="mt-0.5 text-xs font-medium text-zinc-700 tabular-nums dark:text-zinc-300">
+                        {formatRupiah(entry.unitPrice * entry.quantity)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          upsertLine({
+                            replaceKey: entry.key,
+                            menuItemId: entry.item.id,
+                            optionIds: entry.options.map((o) => o.id),
+                            quantity: entry.quantity - 1,
+                            note: entry.note,
+                          })
+                        }
+                        className="flex size-6 items-center justify-center rounded-md border border-zinc-200 text-xs font-bold text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300"
+                      >
+                        -
+                      </button>
+                      <span className="w-4 text-center text-xs font-semibold tabular-nums">
+                        {entry.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          upsertLine({
+                            replaceKey: entry.key,
+                            menuItemId: entry.item.id,
+                            optionIds: entry.options.map((o) => o.id),
+                            quantity: entry.quantity + 1,
+                            note: entry.note,
+                          })
+                        }
+                        className="flex size-6 items-center justify-center rounded-md border border-zinc-200 text-xs font-bold text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="border-t border-zinc-200/90 pt-3 dark:border-zinc-800">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">Total</span>
+                  <span className="text-base font-bold text-zinc-900 tabular-nums dark:text-white">
+                    {formatRupiah(totalAmount)}
+                  </span>
+                </div>
+
+                <Button
+                  type="button"
+                  className="mt-3.5 h-11 w-full rounded-xl bg-zinc-900 font-semibold text-white shadow-xs transition-all hover:bg-zinc-800 active:scale-[0.98] dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-100"
+                  onClick={() => setCartOpen(true)}
+                >
+                  Lanjut ke Pembayaran
+                </Button>
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {/* Floating Bottom Cart Bar for Mobile & Tablet (< lg) */}
       {totalQuantity > 0 && (
-        <div className="sticky bottom-0 z-30 border-t border-zinc-200 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="sticky bottom-0 z-30 border-t border-zinc-200/80 bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95">
           <Button
             type="button"
-            className="h-12 w-full justify-between px-4 text-base"
+            className="h-12 w-full justify-between rounded-xl px-4 text-base font-semibold shadow-xs"
             onClick={() => setCartOpen(true)}
           >
             <span className="flex items-center gap-2">
-              <ShoppingBagIcon />
+              <ShoppingBagIcon className="size-5" />
               {totalQuantity} item
             </span>
             <span className="tabular-nums">{formatRupiah(totalAmount)}</span>

@@ -49,7 +49,7 @@ export function LoginForm() {
   }
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+    <form className="mt-8 space-y-5" onSubmit={handleSubmit} suppressHydrationWarning>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

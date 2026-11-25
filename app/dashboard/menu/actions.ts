@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireOwner } from "@/lib/guards";
+import { requireOwner, requireUser } from "@/lib/guards";
 import { Prisma } from "@/lib/generated/prisma/client";
 import {
   ACCEPTED_IMAGE_TYPES,
@@ -136,7 +136,8 @@ export async function deleteMenuItem(id: string) {
 }
 
 export async function setMenuItemAvailability(id: string, isAvailable: boolean) {
-  await requireOwner();
+  // Both staff/cashier and owner can toggle stock availability
+  await requireUser();
   await prisma.menuItem.update({ where: { id }, data: { isAvailable } });
   revalidatePath("/dashboard/menu");
 }
@@ -249,7 +250,8 @@ export async function setOptionAvailability(
   optionId: string,
   isAvailable: boolean,
 ) {
-  await requireOwner();
+  // Both staff/cashier and owner can toggle option availability (e.g. out of oatmilk)
+  await requireUser();
   await prisma.menuOption.update({
     where: { id: optionId },
     data: { isAvailable },

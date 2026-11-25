@@ -8,15 +8,18 @@ import { useServerActionToast } from "@/hooks/use-server-action-toast";
 export function AvailabilitySwitch({
   itemId,
   isAvailable,
+  size = "default",
 }: {
   itemId: string;
   isAvailable: boolean;
+  size?: "sm" | "default" | "lg";
 }) {
   const [checked, setChecked] = useState(isAvailable);
   const { isPending, run } = useServerActionToast();
 
   return (
     <Switch
+      size={size}
       checked={checked}
       disabled={isPending}
       onCheckedChange={(value) => {

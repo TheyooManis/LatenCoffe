@@ -15,8 +15,8 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-zinc-100 dark:bg-black">
-      <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-white shadow-sm dark:bg-zinc-950">
+    <div className="min-h-screen bg-[#FBF9F5] dark:bg-[#1A1412]">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-white/80 shadow-sm transition-all sm:max-w-2xl md:max-w-4xl lg:max-w-6xl dark:bg-[#2C1F1A]/30">
         {children}
       </div>
     </div>

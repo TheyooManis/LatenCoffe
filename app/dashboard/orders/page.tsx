@@ -1,18 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/guards";
 import { formatClock, startOfTodayWita } from "@/lib/utils";
-import { OrderCard, type OrderCardData } from "@/components/orders/order-card";
+import type { OrderCardData } from "@/components/orders/order-card";
 import { OrdersLiveUpdates } from "@/components/orders/orders-live-updates";
-import type { OrderStatus } from "@/lib/generated/prisma/enums";
+import { OrdersBoard } from "@/components/orders/orders-board";
 
 // Staff always need the current board, never a cached one.
 export const dynamic = "force-dynamic";
-
-const COLUMNS: { status: OrderStatus; title: string; hint: string }[] = [
-  { status: "DITERIMA", title: "Diterima", hint: "Pesanan baru masuk" },
-  { status: "DIPROSES", title: "Diproses", hint: "Sedang dibuat" },
-  { status: "SELESAI", title: "Selesai", hint: "Hari ini" },
-];
 
 export default async function OrdersPage() {
   await requireUser();
@@ -61,48 +55,19 @@ export default async function OrdersPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Pesanan Masuk
           </h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-0.5 text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
             {activeCount === 0
-              ? "Tidak ada pesanan aktif."
-              : `${activeCount} pesanan aktif.`}
+              ? "Tidak ada pesanan aktif saat ini."
+              : `${activeCount} pesanan sedang dalam proses.`}
           </p>
         </div>
         <OrdersLiveUpdates />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {COLUMNS.map((column) => {
-          const columnOrders = cards.filter((c) => c.status === column.status);
-
-          return (
-            <section key={column.status} className="space-y-3">
-              <div className="flex items-baseline justify-between">
-                <h2 className="text-sm font-semibold tracking-wide text-zinc-700 uppercase dark:text-zinc-300">
-                  {column.title}
-                </h2>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {columnOrders.length > 0 ? columnOrders.length : column.hint}
-                </span>
-              </div>
-
-              {columnOrders.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-zinc-300 p-6 text-center dark:border-zinc-700">
-                  <p className="text-sm text-zinc-400">Kosong</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {columnOrders.map((order) => (
-                    <OrderCard key={order.id} order={order} />
-                  ))}
-                </div>
-              )}
-            </section>
-          );
-        })}
-      </div>
+      <OrdersBoard cards={cards} />
     </div>
   );
 }

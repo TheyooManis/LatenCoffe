@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import { SessionProvider } from "@/components/session-provider";
 import { UserMenu } from "@/components/dashboard/user-menu";
+import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 
 export default async function DashboardLayout({
   children,
@@ -23,60 +24,38 @@ export default async function DashboardLayout({
   return (
     <SessionProvider>
     {/* print: the QR sheet is the only thing meant to reach paper. */}
-    <div className="min-h-screen bg-zinc-50 print:bg-white dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white print:hidden dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="min-h-screen bg-[#FBF9F5]/70 print:bg-white dark:bg-[#1A1412]">
+      <header className="sticky top-0 z-30 border-b border-amber-900/10 bg-white/90 backdrop-blur-md print:hidden dark:border-amber-950/40 dark:bg-[#2C1F1A]/90">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 text-xs font-bold text-white dark:bg-white dark:text-zinc-900">
+            <Link href="/dashboard" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2C1F1A] text-xs font-bold text-[#FBF9F5] shadow-xs ring-1 ring-[#C87D43]/40 dark:bg-[#C87D43] dark:text-[#1A1412]">
                 LC
               </span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                Laten Coffee
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold tracking-tight text-[#1A1412] dark:text-[#FBF9F5]">
+                  Laten Coffee
+                </span>
+                <span className="rounded-md bg-amber-100/70 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-amber-900 uppercase dark:bg-amber-950/60 dark:text-amber-300">
+                  {isOwner ? "Owner" : "Kasir"}
+                </span>
+              </div>
             </Link>
 
-            <nav className="hidden items-center gap-1 sm:flex">
-              <Link
-                href="/dashboard"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-              >
-                Ringkasan
-              </Link>
-              <Link
-                href="/dashboard/orders"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-              >
-                Pesanan
-              </Link>
-              {isOwner && (
-                <>
-                  <Link
-                    href="/dashboard/menu"
-                    className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-                  >
-                    Kelola Menu
-                  </Link>
-                  <Link
-                    href="/dashboard/meja"
-                    className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-                  >
-                    Meja &amp; QR
-                  </Link>
-                </>
-              )}
-            </nav>
+            <DashboardNav isOwner={isOwner} />
           </div>
 
-          <UserMenu
-            name={session.user.name}
-            email={session.user.email}
-            signOutAction={signOutAction}
-          />
+          <div className="flex items-center gap-2">
+            <UserMenu
+              name={session.user.name}
+              email={session.user.email}
+              signOutAction={signOutAction}
+            />
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 print:max-w-none print:p-0">
+      <main className="mx-auto w-full max-w-6xl px-4 pt-5 pb-24 sm:px-6 sm:py-8 print:max-w-none print:p-0">
         {children}
       </main>
     </div>

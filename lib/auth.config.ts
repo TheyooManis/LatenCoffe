@@ -1,9 +1,10 @@
 import type { NextAuthConfig } from "next-auth";
 
-/** Dashboard areas only the owner may open. Kasir/dapur get the rest. */
-const OWNER_ONLY_PREFIXES = ["/dashboard/menu", "/dashboard/meja"];
+/** Dashboard areas only the owner may open. Meja & QR is strictly owner. */
+const OWNER_ONLY_PREFIXES = ["/dashboard/meja"];
 
 export const authConfig = {
+  trustHost: true,
   pages: {
     signIn: "/",
   },
